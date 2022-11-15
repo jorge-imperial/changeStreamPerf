@@ -1,14 +1,16 @@
+import argparse
 import json
 from pprint import pprint
 
+import pymongo
 from pymongo import MongoClient, InsertOne
 from pymongo.errors import BulkWriteError
 from pymongo.server_api import ServerApi
 
-from test_constants import test_uri, test_db, test_files
+import test_constants
 
-if __name__ == "__main__":
 
+def populate(test_uri, test_db, test_files):
     client = MongoClient(test_uri, server_api=ServerApi('1'))
 
     client.drop_database(test_db)
@@ -18,6 +20,7 @@ if __name__ == "__main__":
     # import from json files.
     for (coll_name, file) in test_files:
         collection = db.get_collection(coll_name)
+        collection.create_index([("name", pymongo.DESCENDING), ("age", pymongo.DESCENDING)], background=True)
         print(f'Importing file {file} into collection {coll_name}...')
         with open(file, 'rt') as f:
             requests = []
@@ -32,3 +35,13 @@ if __name__ == "__main__":
                     except BulkWriteError as bwe:
                         pprint(bwe.details)
                     requests = []
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(prog='populate.py', description='Run operations in a Mongo Environment.')
+    parser.add_argument('--uri', default=test_constants.test_uri)
+    parser.add_argument('--db', default=test_constants.test_db)
+    parser.add_argument('--files', default=test_constants.test_files)
+
+    args = parser.parse_args()
+    populate(args.uri, args.db, args.files)

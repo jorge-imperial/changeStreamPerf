@@ -69,7 +69,7 @@ def get_oplog(uri, ts_start=None, ts_end=None, output_to_file=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='oplog_tail', description='Parses the oplog and outputs to stdout or file.')
     parser.add_argument('--uri', default=test_constants.test_uri)
-    parser.add_argument('-o', '--out', type=argparse.FileType('w', encoding='UTF-8'))
+    parser.add_argument('--out', type=argparse.FileType('w', encoding='UTF-8'))
     parser.add_argument('--start')
     parser.add_argument('--end')
     args = parser.parse_args()
