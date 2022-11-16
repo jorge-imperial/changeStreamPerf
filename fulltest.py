@@ -10,7 +10,7 @@ from watch import watch
 
 if __name__ == "__main__":
     #
-    test_uri = 'mongodb+srv://root:P4ssw0rd@realmcluster.hqulf.mongodb.net/?retryWrites=true&w=majority'
+    test_uri = 'mongodb+srv://root:XXXXXX@realmcluster.hqulf.mongodb.net/?retryWrites=true&w=majority'
     test_db = 'watched'
     test_files = [('four', 'four.json')]
 
