@@ -1,8 +1,6 @@
-import datetime
-import time
 from datetime import datetime
 import argparse
-
+from time import time
 from bson import Timestamp
 from pymongo import MongoClient, ReadPreference, ASCENDING, CursorType
 
@@ -10,15 +8,20 @@ from pymongo import MongoClient, ReadPreference, ASCENDING, CursorType
 import test_constants
 
 
-def get_oplog(uri, ts_start=None, ts_end=None, output_to_file=None):
+def get_oplog(uri, ts_start=None, ts_end=None, oplog_file_name=None):
     client = MongoClient(uri)
     local_db = client.get_database('local', read_preference=ReadPreference.PRIMARY)
     oplog = local_db.get_collection('oplog.rs')
 
+    oplog_file = None
+    if oplog_file_name:
+        oplog_file = open(oplog_file_name, 'wt')
+
     # Start/stop oplog at these timestamps.
     try:
         if ts_start:
-            ts_start = Timestamp(datetime.fromisoformat(ts_start))
+            t = datetime.fromisoformat(ts_start)
+            ts_start = Timestamp(t, 0)
         else:
             first = oplog.find().sort('$natural', ASCENDING).limit(-1).next()
             ts_start = first['ts']
@@ -27,7 +30,8 @@ def get_oplog(uri, ts_start=None, ts_end=None, output_to_file=None):
 
     try:
         if ts_end:
-            ts_end = Timestamp(datetime.fromisoformat(ts_end))
+            t = datetime.fromisoformat(ts_end)
+            ts_end = Timestamp(t, 0)
         else:
             t = time.time()
             ts_end = Timestamp(int(t), 0)
@@ -51,10 +55,10 @@ def get_oplog(uri, ts_start=None, ts_end=None, output_to_file=None):
             for doc in cursor:
                 ts = doc['ts']
 
-                if not output_to_file:
+                if not oplog_file:
                     print(doc)
                 else:
-                    output_to_file.write(str(doc))
+                    oplog_file.write(str(doc))
 
                 if ts_end and ts >= ts_end:
                     return
@@ -69,9 +73,9 @@ def get_oplog(uri, ts_start=None, ts_end=None, output_to_file=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='oplog_tail', description='Parses the oplog and outputs to stdout or file.')
     parser.add_argument('--uri', default=test_constants.test_uri)
-    parser.add_argument('--out', type=argparse.FileType('w', encoding='UTF-8'))
+    parser.add_argument('--out', default='oplog.json')
     parser.add_argument('--start')
     parser.add_argument('--end')
     args = parser.parse_args()
 
-    get_oplog(args.uri, ts_start=args.start, ts_end=args.end, output_to_file=args.out)
+    get_oplog(args.uri, ts_start=args.start, ts_end=args.end, oplog_file_name=args.out)

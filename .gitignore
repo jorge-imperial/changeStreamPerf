@@ -8,6 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+oplog.json
 build/
 develop-eggs/
 dist/

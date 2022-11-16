@@ -1,31 +1,18 @@
-## Testing performance of change streams
+import datetime
 
-Consists on four scripts:
+from time import sleep
+from multiprocessing import Process
 
-populate.py
-- Drop old database
-- Create collections and insert documents.
+import populate_db
+from operate import run_all_operations
+from tail import get_oplog
+from watch import watch
 
-watch.py
-- start changestream watch threads.
-
-operate.py
-- run operations.
-
-tail.py
-- reads oplog
-
-Using the logs created from the last three steps, gather time at which operations were executed, time at which they were inserted in the oplog and time where the watch operation in the changestream detected them.
-
------------------
-Test clusters 
-Cluster0 (5.0.13)
-Cluster1 (4.4.17)
-Cluster2 (6.0.)
-
-
-```
-def run_test():
+if __name__ == "__main__":
+    #
+    test_uri = 'mongodb+srv://root:P4ssw0rd@realmcluster.hqulf.mongodb.net/?retryWrites=true&w=majority'
+    test_db = 'watched'
+    test_files = [('four', 'four.json')]
 
     start = datetime.datetime.now().isoformat()
 
@@ -59,7 +46,4 @@ def run_test():
     print('Get oplog')
     get_oplog(test_uri, ts_start=start, ts_end=end, oplog_file_name='oplog.json')
 
-
-```
-
-
+    print('Done')
