@@ -11,7 +11,7 @@ import test_constants
 
 
 def populate(test_uri, test_db, test_files):
-    client = MongoClient(test_uri, server_api=ServerApi('1'))
+    client = MongoClient(test_uri) # , server_api=ServerApi('1'))
 
     client.drop_database(test_db)
 

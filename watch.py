@@ -9,11 +9,11 @@ import test_constants
 
 
 def watch(test_uri, test_db, output_to_file):
-    client = MongoClient(test_uri, server_api=ServerApi('1'))
+    client = MongoClient(test_uri) #, server_api=ServerApi('1'))
     print(f'Connected to "{test_uri}"')
 
     db = client.get_database(test_db)
-    print(f'Watch database "{test_db}"')
+    print(f'Watch database "{test_db}" and output to {output_to_file}')
 
     with open(output_to_file, 'wt') as output:
         change_stream = db.watch()
